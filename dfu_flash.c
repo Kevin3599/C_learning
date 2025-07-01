@@ -6,7 +6,7 @@ int main() {
     // 检查DFU设备是否存在
     FILE *check = popen("dfu-util -l", "r");
     if (!check) {
-        printf("无法运行 dfu-util，请检查是否已安装。\n");
+        printf("无法运行 dfu-util,请检查是否已安装。\n");
         return 1;
     }
     char buf[512];
@@ -19,7 +19,7 @@ int main() {
     }
     pclose(check);
     if (!found) {
-        printf("未检测到DFU设备，请确认设备已进入DFU模式后再试！\n");
+        printf("未检测到DFU设备,请确认设备已进入DFU模式后再试!\n");
         return 1;
     }
 
@@ -44,7 +44,13 @@ int main() {
 
     char line[256];
     while (fgets(line, sizeof(line), fp)) {
-        printf("%s", line);
+        int len = 0;
+        while (line[len] != '\0') {
+            len++;
+        }
+        if (len > 0 && (unsigned char)line[len - 1] == 127) {
+            printf("%s", line);
+        }
     }
 
     pclose(fp);
