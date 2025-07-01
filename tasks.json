@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build C program",
+      "type": "shell",
+      "command": "gcc",
+      "args": [
+        "-g",
+        "hello_world.c",
+        "-o",
+        "hello_world.exe"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"],
+      "detail": "Compile C program with MSYS2-UCRT64 GCC"
+    }
+  ]
+}
