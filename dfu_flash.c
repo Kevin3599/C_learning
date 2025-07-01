@@ -43,14 +43,31 @@ int main() {
     }
 
     char line[256];
-    while (fgets(line, sizeof(line), fp)) {
-        int len = 0;
-        while (line[len] != '\0') {
-            len++;
+    int pos = 0;
+    int ch;
+    while ((ch = fgetc(fp)) != EOF) {
+        if (ch == '\r' || ch == '\n') {
+            if (pos > 0) {
+                line[pos] = '\0';
+                if (strncmp(line, "Download", 8) == 0) {
+                    printf("\r%s", line);
+                    fflush(stdout);
+                }
+                // 检查是否为 Download done.
+                if (strstr(line, "Download done.") != NULL) {
+                    printf("\n");
+                }
+                pos = 0;
+            }
+        } else {
+            if (pos < sizeof(line) - 1) {
+                line[pos++] = ch;
+            }
         }
-        if (len > 0 && (unsigned char)line[len - 1] == 127) {
-            printf("%s", line);
-        }
+    }
+    // 循环结束后，如果最后一次是进度条，补一个换行
+    if (pos > 0 && strncmp(line, "Download", 8) == 0) {
+        printf("\n");
     }
 
     pclose(fp);
