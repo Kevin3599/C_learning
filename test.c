@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <locale.h>
-
+ 
 int main() {
     setlocale(LC_ALL, ""); // 设置本地化，支持中文
     char line[100];
