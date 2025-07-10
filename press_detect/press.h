@@ -14,8 +14,8 @@ void wait_for_key_release(void);
 void simple_key_detect_and_print(int key);
 
 // 常用的RK系列ADC设备路径
-#define RK3588_ADC_PATH "/sys/bus/iio/devices/iio:device0/in_voltage0_raw"
-#define RK3568_ADC_PATH "/sys/bus/iio/devices/iio:device0/in_voltage1_raw"
-#define RK3399_ADC_PATH "/sys/bus/iio/devices/iio:device0/in_voltage0_raw"
+//#define RK3588_ADC_PATH "/sys/bus/iio/devices/iio:device0/in_voltage0_raw"
+//#define RK3568_ADC_PATH "/sys/bus/iio/devices/iio:device0/in_voltage1_raw"
+//#define RK3399_ADC_PATH "/sys/bus/iio/devices/iio:device0/in_voltage0_raw"
 
 #endif
