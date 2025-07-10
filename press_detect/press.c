@@ -150,9 +150,9 @@ void wait_for_key_release(void) {
         if (adc_val > 900) {  // 按键已释放
             // 只输出最终结果：按键编号 + 长按/短按
             if (long_press_detected) {
-                printf("长按\n");
+                printf("长按 %ld ms\n", press_duration_ms);
             } else {
-                printf("短按\n");
+                printf("短按 %ld ms\n", press_duration_ms);
             }
             
             press_flag = 0;
