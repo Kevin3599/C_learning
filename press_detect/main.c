@@ -3,7 +3,7 @@
 #include "press.h"
 
 // 全局变量控制程序运行
-static int running = 1;
+int running = 1;  // 🔴 去掉static，让其他文件可以访问
 
 // 信号处理函数
 void signal_handler(int sig) {
@@ -37,6 +37,9 @@ int main() {
     // 主循环 - 检测按键
     while (running) {
         int pressed_key = wait_for_key_press();
+        if (pressed_key == -2) {  // 🔴 检查是否因为Ctrl+C退出
+            break;  // 退出主循环
+        }
         if (pressed_key > 0 && running) {
             simple_key_detect_and_print(pressed_key);
         }

@@ -21,7 +21,6 @@ int adc_init(const char* adc_path) {
         return -1;
     }
     
-    // 静默初始化，不打印成功信息
     return 0;
 }
 
@@ -72,46 +71,6 @@ void debug_print_adc(void) {
 
 // 通过ADC值判断按键是否被按下的函数
 // key4 ADC=9, key5 ADC=235, key6 ADC=457, key7 ADC=683
-int detect_key_press(const char* adc_path) {
-    if (adc_init(adc_path) == 0) {
-        int adc_val = adc_read_raw();
-        
-        // 添加一个"无按键"的范围检测
-        if (adc_val > 900) {  // 1023附近表示没有按键按下
-            printf("按键未触发, ADC: %d\n", adc_val);
-            press_flag = 0;
-            return 0;
-        }
-        else if (adc_val < 50) {  // key4 ADC=9左右
-            printf("key4 ADC: %d\n", adc_val);
-            press_flag = 1;
-            return 4;
-        } 
-        else if (adc_val >= 200 && adc_val < 300) {  // key5 ADC=235左右
-            printf("key5 ADC: %d\n", adc_val);
-            press_flag = 1;
-            return 5;
-        } 
-        else if (adc_val >= 400 && adc_val < 500) {  // key6 ADC=457左右
-            printf("key6 ADC: %d\n", adc_val);
-            press_flag = 1;
-            return 6;
-        } 
-        else if (adc_val >= 650 && adc_val < 750) {  // key7 ADC=683左右
-            printf("key7 ADC: %d\n", adc_val);
-            press_flag = 1;
-            return 7;
-        } 
-        else {
-            printf("ADC读取错误, ADC: %d\n", adc_val);
-            press_flag = 0;
-            return 0;
-        }
-    }
-    return -1;
-}
-
-// 辅助函数：根据ADC值判断按键编号（不打印信息）
 int detect_key_from_adc(int adc_val) {
     if (adc_val > 900) {
         return 0;  // 无按键
@@ -128,11 +87,14 @@ int detect_key_from_adc(int adc_val) {
     }
 }
 
-// 等待按键按下的函数（简单轮询方式）
+// 等待按键按下的函数
 int wait_for_key_press(void) {
     // 静默等待，不打印等待信息
     
-    while (1) {
+    // 需要访问main.c中的running变量，先声明为外部变量
+    extern int running;
+    
+    while (running) {
         int adc_val = adc_read_raw();
         if (adc_val < 0) {
             printf("ADC读取失败\n");
@@ -151,11 +113,16 @@ int wait_for_key_press(void) {
         
         usleep(10000);  // 10ms延时，避免占用太多CPU
     }
+    
+    // 如果running变为0，返回特殊值表示退出
+    return -2;
 }
 
 // 等待按键释放的函数
 void wait_for_key_release(void) {
-    // 静默等待释放，不打印等待信息
+
+    // 需要访问main.c中的running变量
+    extern int running;
 
     // 记录按键按下的开始时间
     struct timespec start_time, current_time;
@@ -164,7 +131,7 @@ void wait_for_key_release(void) {
     int long_press_detected = 0;  // 长按检测标志
     const long LONG_PRESS_TIME_MS = 1000;  // 1秒 = 1000毫秒
     
-    while (1) {
+    while (running) {  // 确保ctrl c可以直接退出到命令行
         int adc_val = adc_read_raw();
         
         // 获取当前时间
@@ -189,16 +156,21 @@ void wait_for_key_release(void) {
             }
             
             press_flag = 0;
-            break;
+            break;  // 正常退出循环
         }
         
         usleep(10000);  // 10ms延时
     }
+    
+    // 如果是因为running=0而退出，不输出按键结果
+    if (!running) {
+        printf("\n");  // 输出换行，保持格式整洁
+    }
 }
 
-// 简洁的按键检测函数 - 只输出按键编号和长短按
+
 void simple_key_detect_and_print(int key) {
     printf("key%d ", key);  // 输出按键编号，不换行
-    wait_for_key_release();  // 这个函数会输出"长按"或"短按"并换行
+    wait_for_key_release();
 }
 
